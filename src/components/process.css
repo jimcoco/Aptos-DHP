@@ -1,0 +1,77 @@
+section.process {
+    position: absolute;
+
+    width: 100dvw;
+    height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap: 2.5rem;
+
+    background-color: white;
+
+    > h1 {
+        font-weight: 600;
+    }
+
+    > div.address {
+        padding: 1rem 3.5rem;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        row-gap: 1rem;
+
+        border: 1px solid var(--light-gray);
+        box-shadow: 0px 0px 8.2px var(--green);
+        border-radius: 10px;
+
+        > h6 {
+            font-size: 1.25rem;
+        }
+
+        > input {
+            font-family: inherit;
+            text-align: center;
+
+            border: none;
+        }
+
+        > input::placeholder {
+            color: var(--light-gray);
+        }
+
+        > input:focus {
+            outline: none;
+        }
+    }
+
+    > h6 {
+        max-width: 50dvw;
+
+        color: var(--light-gray);
+    }
+
+    > div.progress {
+        width: 4.75rem;
+        height: 4.75rem;
+
+        border-radius: 50%;
+        border: 7px solid var(--green);
+        border-left-color: transparent;
+
+        animation: spin 2s linear infinite;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
