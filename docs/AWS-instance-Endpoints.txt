@@ -1,0 +1,45 @@
+Checking Status:  
+
+Method    : Get
+URL       : https://28g5pjoyra.execute-api.ap-southeast-1.amazonaws.com/prod/flaskapp
+
+Headers
+authorizationToken :  blendAVAX2024
+
+
+
+-----------------------------------------------------------------------------------------------
+
+
+
+Start EC2 instance:  
+
+Method    : POST
+URL       : https://28g5pjoyra.execute-api.ap-southeast-1.amazonaws.com/prod/flaskapp/startflaskapp
+
+Headers
+authorizationToken :  blendAVAX2024
+
+
+-----------------------------------------------------------------------------------------------
+
+
+Stop EC2 instance:  
+
+Method    : POST
+URL       : https://28g5pjoyra.execute-api.ap-southeast-1.amazonaws.com/prod/flaskapp/stop-instance
+
+Headers
+authorizationToken :  blendAVAX2024
+
+-----------------------------------------------------------------------------------------------
+
+
+Process image:
+
+REFER TO PROCESS-IMAGE-API.PDF
+
+response in the form of s3 url
+  return jsonify({'message': 'Image processed', 's3_url': f'https://{bucket_name}.s3.ap-southeast-1.amazonaws.com/outputs/{file.filename}_reconstruction_mesh.obj'})
+
+

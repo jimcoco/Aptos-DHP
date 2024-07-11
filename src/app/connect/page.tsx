@@ -2,14 +2,28 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { PetraWalletName } from 'petra-plugin-wallet-adapter';
 
+import useDigitalId from '../hooks/useDigitalId';
+
 import './connect.css';
 
 export default function ConnectWallet() {
-    const { connect } = useWallet();
+    const router = useRouter();
+    const { connect, account } = useWallet();
+
+    const { hasDigitalId } = useDigitalId();
+
+    useEffect(() => {
+        if (account)
+            hasDigitalId(account.address).then((hasId) =>
+                router.push(hasId ? '/digital-id' : '/data/face')
+            );
+    }, [account]);
 
     return (
         <main className='connect'>

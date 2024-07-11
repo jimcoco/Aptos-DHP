@@ -1,0 +1,19 @@
+The AI model is hosted on an AWS EC2 Virtual Server, and it's main function is to get an input of a human selfie, 
+and return back a 3D obj file of the user (which is basically a 3d model of the human face). 
+Hence, you first need to store the user uploaded selfie image onto the s3 bucket, and get a link of that uploaded image. 
+Then, you pass this link to the AI model to process that image, then the model will also return a link of the output 3d obj file.
+
+This is how you use the API:
+1) start the server
+2) check the status of the server (make sure it is started)
+3) manual loading (delay) for 3 minutes: server need to warm up before ready to use
+4) upload image
+5) dry run process image API for three times
+6) fourth time of running process image API will only 100% give u back the output (a bug that cant be solve, so getting the 4th times result will be perfect)
+7) stop server
+8) check the status of the server (make sure it is stopped as it is super expensive)
+
+Note: start, stop and check server required the authorization token as the header
+Note: please do double confirm that you stop the server when you are not doing the development, and also do use it wisely and don't consume too much resources.
+Note: to prevent unexpected behaviour or bad actor, running server shall be stopped after running for 3 minutes, or when window tab is closed. 
+This will ensure that the server will not keep running all the time if the whole process didnt reach the Step7 (stop server API calling)
