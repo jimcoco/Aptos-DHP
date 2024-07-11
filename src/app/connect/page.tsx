@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { PetraWalletName } from 'petra-plugin-wallet-adapter';
 
-import useDigitalId from '../hooks/useDigitalId';
+import useDigitalId from '@/hooks/useDigitalId';
 
 import './connect.css';
 

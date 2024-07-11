@@ -79,7 +79,13 @@ export async function PUT(request: NextRequest) {
             },
         });
 
-        return NextResponse.json({ ipfsHash: updatedPinataResponse.IpfsHash }, { status: 200 });
+        return NextResponse.json(
+            {
+                dataIpfsHash: pinataResponse.IpfsHash,
+                digitaIdIpfsHash: updatedPinataResponse.IpfsHash,
+            },
+            { status: 200 }
+        );
     } catch (error) {
         console.log(error);
         return NextResponse.json({ error }, { status: 500 });

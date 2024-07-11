@@ -12,7 +12,7 @@ module digital_human::digital_id {
 	use aptos_framework::account::{Self, SignerCapability};
 	use aptos_framework::resource_account;
 
-	use aptos_token_objects::token::{Self, MutatofRef};
+	use aptos_token_objects::token::{Self, MutatorRef};
 	use aptos_token_objects::collection::{Self, Collection};
 	use aptos_token_objects::royalty::{Royalty};
 
@@ -23,6 +23,8 @@ module digital_human::digital_id {
 	struct State has key, store {
 		signer_cap: SignerCapability,
 		collection: Object<Collection>,
+		
+		total: u64
 	}
 
 	struct DigitalId has key {
@@ -30,7 +32,7 @@ module digital_human::digital_id {
 		iris: Option<address>,
 		fingerprint: Option<address>,
 
-		mutator_ref: MutatofRef
+		mutator_ref: MutatorRef
 	}
 
 	#[event]
@@ -51,22 +53,23 @@ module digital_human::digital_id {
 
 		let constructor_ref = &collection::create_unlimited_collection(
 			resource, 
-			string::utf8(b"Test Description"), 
-			string::utf8(b"Test Name"), 
+			string::utf8(b"Digital Human Project on Aptos"), 
+			string::utf8(b"Digital Human"), 
 			option::none<Royalty>(),
-			string::utf8(b"Collection URI")
+			string::utf8(b"URI")
 		);
 
 		move_to<State>(resource, State {
 			signer_cap,
-			collection: object::object_from_constructor_ref<Collection>(constructor_ref)
+			collection: object::object_from_constructor_ref<Collection>(constructor_ref),
+			total: 0
 		});
 	}
 
 	entry fun create_digital_id(sender: &signer, metadata: String) acquires State {
 		assert!(!exists<DigitalId>(signer::address_of(sender)), error::already_exists(EDigitalIdExists));
 
-		let state = borrow_global<State>(@digital_human);
+		let state = borrow_global_mut<State>(@digital_human);
 		let resource_signer = &account::create_signer_with_capability(&state.signer_cap);
 
 		let constructor_ref = token::create(
@@ -91,6 +94,8 @@ module digital_human::digital_id {
 			mutator_ref: token::generate_mutator_ref(&constructor_ref)
 		});
 
+		*&mut state.total = *&mut state.total + 1;
+
 		event::emit(CreateDigitalId {
 			creator: signer::address_of(sender),
 			digital_id: digital_id_address
@@ -114,7 +119,7 @@ module digital_human::digital_id {
 			string::utf8(if (is_iris) b"Verified Iris Data" else b"Verified Fingerprint Data"), 
 			string::utf8(if (is_iris) b"Iris" else b"Fingerprint"), 
 			option::none<Royalty>(), 
-			metadata
+			data_metadata
 		);
 
 		let verified_data_signer = object::generate_signer(&constructor_ref);
@@ -146,5 +151,10 @@ module digital_human::digital_id {
 	#[view]
 	public fun has_digital_id(person: address): bool {
 		exists<DigitalId>(person)
+	}
+
+	#[view]
+	public fun get_total_people(): u64 acquires State {
+		*&borrow_global<State>(@digital_human).total
 	}
 }

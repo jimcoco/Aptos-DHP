@@ -2,15 +2,28 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useWallet } from '@aptos-labs/wallet-adapter-react';
+
+import useDigitalId from '@/hooks/useDigitalId';
 
 import BiometricsMethod from './BiometricsMethod';
-import Nav from '../../components/Nav';
-import { useWallet } from '@aptos-labs/wallet-adapter-react';
+import Nav from '@/components/Nav';
 
 import './digital-id.css';
 
 export default function DigitalHuman() {
-    const { account } = useWallet();
+    const router = useRouter();
+    const { account, connected } = useWallet();
+    const { getDigitalId } = useDigitalId();
+
+    const [digitalId, setDigitalId] = useState<DigitalId>();
+
+    useEffect(() => {
+        if (!connected) router.push('/');
+        else getDigitalId(account?.address as string).then((data) => setDigitalId(data));
+    }, [connected]);
 
     return (
         <main className='digital-id'>
@@ -23,7 +36,7 @@ export default function DigitalHuman() {
                     width={360}
                     height={474}
                 />
-                <h1>My Name</h1>
+                <h1>{digitalId ? digitalId.name : 'Fetching...'}</h1>
                 <h6 className='address'>
                     {account
                         ? account.address.slice(0, 5) + '...' + account.address.slice(59, 64)
@@ -32,7 +45,11 @@ export default function DigitalHuman() {
                 <div className='human-data'>
                     <div>
                         <Image src='/icons/aptos.svg' alt='passport' width={20} height={20} />
-                        <Link href={'/'}>View Digital Human ID</Link>
+                        <Link
+                            href={`https://explorer.aptoslabs.com/object/${digitalId?.digitalIdAddress}?network=devnet`}
+                        >
+                            View Digital Human ID
+                        </Link>
                     </div>
                     <Image
                         src='/icons/face-preview.png'

@@ -1,9 +1,22 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+import useDigitalId from '@/hooks/useDigitalId';
 
 import './home.css';
 
 export default function Home() {
+    const { getParticipants } = useDigitalId();
+
+    const [participants, setParticipants] = useState(0);
+
+    useEffect(() => {
+        getParticipants().then((data) => setParticipants(data));
+    }, []);
+
     return (
         <main className='home'>
             <Image id='gray-logo' src='/icons/logo.svg' alt='logo' width={43} height={39} />
@@ -16,7 +29,7 @@ export default function Home() {
                 </Link>
                 <button id='gray-button'>Connect Identity</button>
             </div>
-            <div className='participants'>1 unique human participated</div>
+            <div className='participants'>{participants} unique humans participated</div>
             <Image
                 className='planet'
                 src='/images/planet.png'

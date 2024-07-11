@@ -6,19 +6,27 @@ import Link from 'next/link';
 import ProcessingPopup from '@/components/ProcessingPopup';
 import Nav from '@/components/Nav';
 
-import { useMemo, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 import pageData from './pageData';
 
 import './data.css';
+import { useWallet } from '@aptos-labs/wallet-adapter-react';
 
 export default function DataCollection() {
+    const router = useRouter();
     const dataType = usePathname().split('/')[2];
     const data = pageData[dataType];
 
+    const { connected } = useWallet();
+
     const [file, setFile] = useState<File | undefined>(undefined);
     const [verification, setVerification] = useState(false);
+
+    useEffect(() => {
+        if (!connected) router.push('/');
+    }, [connected]);
 
     return (
         <main className='data'>
