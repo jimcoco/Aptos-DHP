@@ -2,14 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 
 import useDigitalId from '@/hooks/useDigitalId';
 
-import BiometricsMethod from './BiometricsMethod';
+import BiometricsStatus from './BiometricsStatus';
 import Nav from '@/components/Nav';
+import ObjViewer from '@/components/ObjViewer';
+
+import { DigitalId } from '@/types';
 
 import './digital-id.css';
 
@@ -20,10 +23,14 @@ export default function DigitalHuman() {
 
     const [digitalId, setDigitalId] = useState<DigitalId>();
 
+    const [objFile, setObjFile] = useState<File>();
+    const [objViewer, setObjViewer] = useState(false);
+
     useEffect(() => {
         if (!connected) router.push('/');
-        else getDigitalId(account?.address as string).then((data) => setDigitalId(data));
-    }, [connected]);
+        if (connected && account)
+            getDigitalId(account.address as string).then((data) => setDigitalId(data));
+    }, [connected, account]);
 
     return (
         <main className='digital-id'>
@@ -56,20 +63,41 @@ export default function DigitalHuman() {
                         alt='face-preview'
                         width={20}
                         height={20}
+                        onClick={async () => {
+                            if (!digitalId) return;
+
+                            const response = await fetch(digitalId.faceIpfsHash);
+                            const file = new File([await response.blob()], 'face.obj');
+                            setObjFile(file);
+                            setObjViewer(true);
+                        }}
                     />
                 </div>
                 <h6>Biometrics</h6>
                 <div className='biometrics'>
-                    <BiometricsMethod name='Iris' image='iris.svg' href='/data/iris' />
-                    <BiometricsMethod
-                        name='Fingerprint'
-                        image='fingerprint.svg'
-                        href='/data/fingerprint'
-                    />
+                    {useMemo(
+                        () => (
+                            <>
+                                <BiometricsStatus
+                                    name='Iris'
+                                    objectAddress={digitalId?.irisAddress}
+                                />
+                                <BiometricsStatus
+                                    name='Fingerprint'
+                                    objectAddress={digitalId?.fingerprintAddress}
+                                />
+                            </>
+                        ),
+                        [digitalId]
+                    )}
                 </div>
                 <Link href={'/'} className='home-button'>
                     <Image src='/icons/home-button.svg' alt='home' width={72} height={72} />
                 </Link>
+                {useMemo(
+                    () => (objViewer && objFile ? <ObjViewer file={objFile} /> : <></>),
+                    [objViewer]
+                )}
             </section>
         </main>
     );

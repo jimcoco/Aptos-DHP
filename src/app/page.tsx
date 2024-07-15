@@ -2,9 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
 import useDigitalId from '@/hooks/useDigitalId';
+
+const World = dynamic(() => import('@/components/ui/globe').then((m) => m.World), {
+    ssr: false,
+});
+import { arcs, globeConfig } from '@/data/globe-data';
 
 import './home.css';
 
@@ -27,16 +33,12 @@ export default function Home() {
                     <Image src='/icons/aptos.svg' alt='aptos' width={20} height={20} />
                     Generate Identity
                 </Link>
-                <button id='gray-button'>Connect Identity</button>
+                <Link id='gray-button' href='/connect'>
+                    Connect Identity
+                </Link>
             </div>
             <div className='participants'>{participants} unique humans participated</div>
-            <Image
-                className='planet'
-                src='/images/planet.png'
-                alt='planet'
-                width={1280}
-                height={362}
-            />
+            <World globeConfig={globeConfig} data={arcs} />
         </main>
     );
 }

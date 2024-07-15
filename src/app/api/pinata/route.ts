@@ -1,44 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
 
 import PinataSDK from '@pinata/sdk';
+import { Readable } from 'stream';
+
+import { encrypt, decrypt } from '@/utils/crypto-utils';
 
 const pinata = new PinataSDK({
     pinataApiKey: process.env.PINATA_API,
     pinataSecretApiKey: process.env.PINATA_SECRET,
 });
 
+export async function GET(request: NextRequest) {
+    try {
+        const url = new URL(request.url);
+        const searchParams = new URLSearchParams(url.searchParams);
+        const ipfsHash = searchParams.get('ipfsHash') as string;
+
+        const pinList = await pinata.pinList({
+            hashContains: ipfsHash,
+        });
+        const name = (pinList.rows[0].metadata.name as string).split(' - ')[0];
+        const key = (pinList.rows[0].metadata.keyvalues as any).key as string;
+
+        const response = await fetch(`${process.env.PINATA_URL}${ipfsHash}`);
+        const digitalId = await response.json();
+
+        const objHash = decrypt(digitalId.attributes[0].value, key);
+        return NextResponse.json(
+            { name, objLink: `${process.env.PINATA_URL}${objHash}` },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json({ error, name: 'Null', objLink: '' }, { status: 500 });
+    }
+}
+
+let tries = 1;
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
+        const formData = await request.formData();
+        const personName = formData.get('personName') as string;
+        const key = formData.get('key') as string;
+        const faceData = formData.get('faceData') as Blob;
 
-        if (!body.personName) throw new Error('No name was provided');
-        if (!body.faceData) throw new Error('No face data was provided');
+        if (!personName) throw new Error('No name was provided');
+        if (!faceData) throw new Error('No face data was provided');
+        if (!key) throw new Error('No key was provided');
 
-        const faceDataHash = 'some face data hash'; //todo pin obj file and then hash ipfsHash
-
+        const buffer = await faceData.arrayBuffer();
+        const faceDataHashed = await pinAndEncrypt(Buffer.from(buffer), personName, key);
         const pinataResponse = await pinata.pinJSONToIPFS(
             {
                 name: 'Digital ID',
                 image: `${process.env.PINATA_URL}${process.env.ID_IMAGE}`,
-                attributes: [{ trait_type: 'Face', value: faceDataHash }],
+                attributes: [{ trait_type: 'Face', value: faceDataHashed }],
             },
             {
                 pinataMetadata: {
-                    name: `${body.personName} - Digital ID`,
+                    name: `${personName} - Digital ID`,
+                    // @ts-ignore
+                    keyvalues: {
+                        key: key,
+                    },
                 },
             }
         );
 
         return NextResponse.json({ ipfsHash: pinataResponse.IpfsHash }, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error }, { status: 500 });
+        console.log(error);
+        if (tries > 3) return NextResponse.json({ error }, { status: 500 });
+
+        tries++;
+        return await POST(request);
     }
 }
 
 export async function PUT(request: NextRequest) {
     try {
-        const body = await request.json();
+        const body: {
+            dataType: 'iris' | 'fingerprint';
+            image: any;
+            digitalIdHash: string;
+        } = await request.json();
 
         if (body.dataType != 'iris' && body.dataType != 'fingerprint')
             throw new Error('Wrong data type');
@@ -47,8 +92,9 @@ export async function PUT(request: NextRequest) {
 
         const pinList = await pinata.pinList({ hashContains: body.digitalIdHash });
         const personName = (pinList.rows[0].metadata.name as string).split(' - ')[0];
+        const key = (pinList.rows[0].metadata.keyvalues as any).key;
 
-        const imageDataHash = 'some hash'; //todo fs.createReadStream() and read the image then hash the ipfsHash
+        const imageDataHash = await pinAndEncrypt(body.image.data, personName, key);
         const isIris = body.dataType == 'iris';
         const pinataResponse = await pinata.pinJSONToIPFS(
             {
@@ -76,6 +122,10 @@ export async function PUT(request: NextRequest) {
         const updatedPinataResponse = await pinata.pinJSONToIPFS(digitalId, {
             pinataMetadata: {
                 name: `${personName} - Digital ID`,
+                // @ts-ignore
+                keyvalues: {
+                    key,
+                },
             },
         });
 
@@ -90,4 +140,14 @@ export async function PUT(request: NextRequest) {
         console.log(error);
         return NextResponse.json({ error }, { status: 500 });
     }
+}
+
+async function pinAndEncrypt(file: Buffer, name: string, key: string) {
+    const pinnedData = await pinata.pinFileToIPFS(Readable.from(Buffer.from(file)), {
+        pinataMetadata: {
+            name: `${name} - Face`,
+        },
+    });
+
+    return encrypt(pinnedData.IpfsHash, key);
 }

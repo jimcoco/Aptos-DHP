@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-digital_human = "e73532dd6f4220d8211caa8fa472d331ff973cac272222a8769a03f06a62b9c2"
+digital_human = "9025db89c6f67e6841d55d91a99db450b278408de9357a9fe14834a17fcc0b3e"
 owner = "d4ee4a6e90e9fcf4f2349dfefabf9ae4845cc174153c18b9ebabc0b1853c03a5"
 
 [dev-addresses]

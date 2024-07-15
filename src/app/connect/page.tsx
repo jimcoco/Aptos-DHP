@@ -19,10 +19,11 @@ export default function ConnectWallet() {
     const { hasDigitalId } = useDigitalId();
 
     useEffect(() => {
-        if (account)
+        if (account) {
             hasDigitalId(account.address).then((hasId) =>
                 router.push(hasId ? '/digital-id' : '/data/face')
             );
+        }
     }, [account]);
 
     return (

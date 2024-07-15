@@ -40,11 +40,9 @@ main.home {
         border-radius: 50px;
     }
 
-    > img.planet {
-        position: absolute;
+    > div:last-child {
+        position: absolute !important;
+        transform: translateY(55dvh);
         bottom: 0;
-
-        width: 80rem;
-        height: auto;
     }
 }

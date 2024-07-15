@@ -1,8 +1,12 @@
-import { Aptos, AptosConfig, InputViewFunctionData, Network } from '@aptos-labs/ts-sdk';
+import { Aptos, AptosConfig, InputViewFunctionData, Network, Signature } from '@aptos-labs/ts-sdk';
 import { InputTransactionData, useWallet } from '@aptos-labs/wallet-adapter-react';
 
+import signMessageToBytes from '@/utils/sign-message';
+
+import { DigitalId } from '@/types';
+
 const useDigitalId = () => {
-    const { signAndSubmitTransaction } = useWallet();
+    const { signAndSubmitTransaction, signMessage } = useWallet();
 
     const aptosConfig = new AptosConfig({ network: Network.DEVNET });
     const aptos = new Aptos(aptosConfig);
@@ -40,43 +44,57 @@ const useDigitalId = () => {
         const digitalId: DigitalId = {
             name: body.name,
             digitalIdAddress: resource.token_id,
-            faceIpfsHash: token.uri.split('/')[4],
+            faceIpfsHash: body.objLink,
         };
 
-        if (resource.iris.length) digitalId.irisAddress = resource.iris[0];
-        if (resource.fingerprint.length) digitalId.fingerprintAddress = resource.fingerprint[0];
+        if (resource.iris.vec.length) digitalId.irisAddress = resource.iris.vec[0];
+        if (resource.fingerprint.vec.length)
+            digitalId.fingerprintAddress = resource.fingerprint.vec[0];
 
         return digitalId;
     };
 
-    const mintDigitalId = async (address: string, name: string) => {
+    const createDigitalId = async (address: string, name: string, faceData: Buffer) => {
         const exists = await hasDigitalId(address);
         if (exists) return;
-        //todo get not encoded faceData
+
+        const signedResponse = await signMessage({
+            message: address + name + Date.now(),
+            nonce: '127',
+        });
+        const signature = signedResponse.signature as Signature;
+
+        const formData = new FormData();
+        formData.append('faceData', new Blob([faceData]));
+        formData.append('personName', name);
+        formData.append('key', signature.toString());
 
         const response = await fetch('/api/pinata', {
             method: 'POST',
-            body: JSON.stringify({
-                personName: name,
-                faceData: 'proceeded face data',
-            }),
+            body: formData,
         });
+        if (response.status != 200) return;
         const body = await response.json();
 
         const tx: InputTransactionData = {
             data: {
                 function: `${process.env.NEXT_PUBLIC_MODULE}::digital_id::create_digital_id`,
-                functionArguments: [`${process.env.PINATA_URL}${body.ipfsHash}`],
+                functionArguments: [
+                    `${process.env.PINATA_URL}${body.ipfsHash}`,
+                    signMessageToBytes(`${process.env.PINATA_URL}${body.ipfsHash}`),
+                ],
             },
         };
         await signAndSubmitTransaction(tx);
     };
 
-    const verifyDigitalData = async (address: string, dataType: 'iris' | 'fingerprint') => {
+    const verifyDigitalData = async (
+        address: string,
+        dataType: 'iris' | 'fingerprint',
+        image: Buffer
+    ) => {
         const exists = await hasDigitalId(address);
         if (!exists) return;
-
-        //todo get not encoded data image
 
         const resource = await aptos.getAccountResource({
             accountAddress: address,
@@ -94,16 +112,22 @@ const useDigitalId = () => {
             method: 'PUT',
             body: JSON.stringify({
                 dataType,
-                image: 'some image of iris or fingerprint',
+                image,
                 digitalIdHash: token.uri.split('/')[4],
             }),
         });
+        if (response.status != 200) return;
         const body = await response.json();
 
         const tx: InputTransactionData = {
             data: {
                 function: `${process.env.NEXT_PUBLIC_MODULE}::digital_id::verify_data`,
-                functionArguments: [body.digitaIdIpfsHash, dataType, body.dataIpfsHash],
+                functionArguments: [
+                    `${process.env.PINATA_URL}${body.digitaIdIpfsHash}`,
+                    dataType,
+                    `${process.env.PINATA_URL}${body.dataIpfsHash}`,
+                    signMessageToBytes(`${process.env.PINATA_URL}${body.digitaIdIpfsHash}`),
+                ],
             },
         };
         await signAndSubmitTransaction(tx);
@@ -117,7 +141,7 @@ const useDigitalId = () => {
         return response[0] ? Number(response[0]) : 0;
     };
 
-    return { hasDigitalId, mintDigitalId, verifyDigitalData, getParticipants, getDigitalId };
+    return { hasDigitalId, createDigitalId, verifyDigitalData, getParticipants, getDigitalId };
 };
 
 export default useDigitalId;
