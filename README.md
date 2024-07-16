@@ -1,36 +1,13 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## What is Digital Human Project?
 
-## Getting Started
+**Digital Human Project is the first proof of personhood on Aptos**. The goal is to build a human-only digital identity network (human-centric) that allows individuals to easily claim their humanness in this AI era surrounded by bots. The core concept is to store human identity data on Aptos as digital assets, which is called the Digital Human ID, that humans can carry across the different ecosystem applications and prove themselves as unique humans for simple verification, acting as a universal digital identification. Humans are able to mint biometric tokens with their biometric data and compose them to form a complex Digital Human ID with higher verification levels. Digital Human ID can be easily intergated to DApps as sign-in method or gate content based on the verification level. The biometric tokens concept also open up endless possibilities of biometric data or even personal info (for example: DNA profiles, voice data, signatures, school ID) which can be used to mint a verification token and increase an individual verification level of their Digital Human ID. Soon, the project is ready to introduce custom biometric hardwares and set up physical verification points worldwide to ensure a more trusted environment during the verification process.
 
-First, run the development server:
+## Tackling Problems of Digital Identity Space
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1.  **Proving Humanness Is Hard**: AI has made proving humanness more challenging, especially during Sybil attacks, where bots surround real humans. How can we easily identify ourselves as humans and be able to gate some content or space for only humans and not bots? We need a medium that embed all our identity information, and can easily prove our humanness for fast verification in different applications and real-world use case.
+   
+2.  **Lack of Privacy and Ownership**: Although there are various identity solutions (for example: email and phone verification, hybrid method verification, official KYC - Know Your Customer, Web of Trust, etc), privacy is a fundamental human right, and our sensitive personal data or biometrics should not be handled by centralised third parties. In other word, we should have full ownership of our digital identity data which is handled in a decentralised way. Hence, an open and permissionless protocol is needed.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3.  **Not All-In-One**: There is no existing solution which pack all your digital identity data (personal data or biometrics) into one and let you to carry around the ecosystem for utilisation.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+4.  **Sensitive Data Security Consideration**: Existing digital identity solution is not safe from some security aspects as applications or third-party will have direct access to it. We need a session-specific ID mechanism which can perform ephemeral verification using our digital identity, but without direct access.
