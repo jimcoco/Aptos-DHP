@@ -9,7 +9,7 @@ import useImageProcessing from '@/hooks/useImageProcessing';
 import { State } from 'types';
 
 interface Props {
-    createDigitalId: (address: string, name: string, faceData: Buffer) => Promise<void>;
+    createDigitalId: (address: string, name: string, faceDataLink: string) => Promise<void>;
     setFinished: Dispatch<SetStateAction<boolean>>;
     file: File;
 }
@@ -71,15 +71,7 @@ export default function Reconstruction({ createDigitalId, setFinished, file }: P
         () => async () => {
             if (!name) return;
             setStage(4);
-            console.log(objLink);
-            const objMesh = await fetch(objLink);
-            const blob = await objMesh.blob();
-
-            await createDigitalId(
-                account?.address as string,
-                name,
-                Buffer.from(await blob.arrayBuffer())
-            );
+            await createDigitalId(account?.address as string, name, objLink);
             await stopServerRecursion();
             setFinished(true);
         },

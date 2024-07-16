@@ -12,10 +12,6 @@ main.digital-id {
         align-items: center;
         justify-items: start;
 
-        > obj.container {
-            position: absolute;
-        }
-
         > img.passport {
             grid-row: 1 / 6;
 
@@ -33,9 +29,14 @@ main.digital-id {
                 cursor: pointer;
             }
 
-            > img {
+            > a {
                 width: 2rem;
                 height: auto;
+
+                > img {
+                    width: 100%;
+                    height: auto;
+                }
             }
 
             > div {

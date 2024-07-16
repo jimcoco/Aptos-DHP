@@ -1,7 +1,7 @@
 export interface DigitalId {
     name: string;
     digitalIdAddress: string;
-    faceIpfsHash: string;
+    faceLink: string;
     irisAddress?: string;
     fingerprintAddress?: string;
 }

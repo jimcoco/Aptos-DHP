@@ -24,7 +24,7 @@ export default function BiometricsStatus({ name, objectAddress }: Props) {
                 <div className='status'>
                     <Image src={`/icons/verified.png`} alt='verified' height={16} width={16} />
                     <Link
-                        href={`https://explorer.aptoslabs.com/object/${objectAddress}?network=devnet`}
+                        href={`https://explorer.aptoslabs.com/object/${objectAddress}?network=testnet`}
                     >
                         Verified on Aptos
                     </Link>
