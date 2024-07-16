@@ -6,6 +6,8 @@
 
 <br>
 
+![Group 34](https://github.com/user-attachments/assets/cf84a5e9-bc11-4a7b-a466-c3057b79f9d3)
+
 ## What is Digital Human Project?
 
 **Digital Human Project is the first proof of personhood on Aptos**. The goal is to build a human-only digital identity network (human-centric) that allows individuals to easily claim their humanness in this AI era surrounded by bots. The core concept is to store human identity data on Aptos as digital assets, which is called the Digital Human ID, that humans can carry across the different ecosystem applications and prove themselves as unique humans for simple verification, acting as a universal digital identification. Humans are able to mint biometric tokens with their biometric data and compose them to form a complex Digital Human ID with higher verification levels. Digital Human ID can be easily intergated to DApps as sign-in method or gate content based on the verification level. The biometric tokens concept also open up endless possibilities of biometric data or even personal info (for example: DNA profiles, voice data, signatures, school ID) which can be used to mint a verification token and increase an individual verification level of their Digital Human ID. Soon, the project is ready to introduce custom biometric hardwares and set up physical verification points worldwide to ensure a more trusted environment during the verification process.
