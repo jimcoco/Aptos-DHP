@@ -1,5 +1,5 @@
 <div align="left">
-    <img src="" width=100>
+    <img src="https://github.com/user-attachments/assets/2b80507f-0d33-4c22-8d56-ae5705a536d3" width=100>
     <h1>Digital Human Project</h1>
     <strong>Proof of Personhood on Aptos | Human-Centric Digital Identity Network</strong>  
 </div>
